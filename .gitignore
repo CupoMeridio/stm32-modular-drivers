@@ -1,0 +1,21 @@
+# Compiler outputs
+*.o
+*.d
+*.elf
+*.bin
+*.map
+*.hex
+
+# IDE files
+.settings/
+.project
+.cproject
+.mxproject
+*.launch
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.bak
+*~
