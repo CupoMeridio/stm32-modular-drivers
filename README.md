@@ -16,6 +16,7 @@ libreria/
 │   ├── button.h      # Dichiarazione dell'oggetto button_t e delle API di lettura
 │   ├── queue.h       # Dichiarazione dell'oggetto queue_t (Buffer Circolare FIFO)
 │   ├── timer.h       # Dichiarazione dell'oggetto timer_t (Timer/PWM/Duty Helper)
+│   ├── servo.h       # Dichiarazione dell'oggetto servo_t e delle API del servomotore
 │   ├── fsm_logic.h   # Dichiarazione dello scheletro della Macchina a Stati (FSM)
 │   └── ds3231_oop.h  # Driver RTC DS3231 ad Oggetti (Lettura atomica ed efficiente)
 ├── Src/
@@ -23,6 +24,7 @@ libreria/
 │   ├── button.c      # Implementazione del driver Button con debounce non bloccante
 │   ├── queue.c       # Implementazione della coda FIFO generica e thread-safe
 │   ├── timer.c       # Implementazione delle API di configurazione dei timer hardware
+│   ├── servo.c       # Implementazione del driver servo (indipendente da ARR)
 │   ├── fsm_logic.c   # Template per l'evoluzione degli stati FSM
 │   └── ds3231_oop.c  # Driver RTC DS3231 con gestione I2C non bloccante ad oggetti
 └── README.md         # Questa documentazione
@@ -49,6 +51,11 @@ Il modulo `queue` implementa un buffer circolare generico (tramite `memcpy` e pu
 * **`QUEUE_MODE_REJECT` (Default):** Se la coda è piena, rifiuta i nuovi inserimenti restituendo `QUEUE_FULL`. Ideale per non perdere messaggi o comandi di controllo (es. gli override del semaforo).
 * **`QUEUE_MODE_OVERWRITE`:** Se la coda è piena, il nuovo dato inserito sovrascrive automaticamente quello più vecchio (facendo avanzare la testa `head` di conseguenza). Ideale per buffer di dati continui (es. medie mobili di sensori) in cui contano solo le letture più fresche.
 * **Sicurezza nei contesti ad Interrupt:** Tutte le funzioni critiche disabilitano temporaneamente gli interrupt (`__disable_irq()`), rendendo le modifiche degli indici atomiche e protette da preemption concorrente.
+
+### 5. Controllo Servomotore Autoadattativo (SG90)
+Il modulo `servo` implementa la gestione del servomotore SG90 tramite segnale PWM a 50 Hz.
+* **Indipendenza dall'ARR hardware:** Il calcolo del ciclo di lavoro (Duty Cycle) per impostare i gradi di rotazione (da 0° a 180°, mappati su impulsi da 0.5 ms a 2.5 ms) legge a runtime il registro di auto-reload del timer (`ARR`) tramite la macro `__HAL_TIM_GET_AUTORELOAD`. Modifiche della frequenza di clock o della risoluzione del timer in CubeMX non richiedono quindi alcuna modifica al codice.
+* **Limitazione software e sicurezza:** Il driver impone limiti software configurabili (`servo_set_bounds()`) per prevenire rotazioni oltre i limiti meccanici del servo, riducendo lo stress meccanico e i picchi di corrente.
 
 ---
 
