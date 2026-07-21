@@ -1,12 +1,12 @@
-# STM32 HAL Modular Drivers (LED, Button & Queue) 🚀
+# STM32 HAL Modular Drivers (LED, Button & Queue)
 
-Una raccolta di driver modulari in C, scritti secondo i paradigmi della **programmazione orientata agli oggetti** e dell'**astrazione hardware**, pensati per lo sviluppo embedded su microcontrollori STM32 tramite le librerie **HAL (Hardware Abstraction Layer)**.
+Una raccolta di driver modulari in C, scritti secondo i paradigmi della programmazione orientata agli oggetti e dell'astrazione hardware, pensati per lo sviluppo embedded su microcontrollori STM32 tramite le librerie HAL (Hardware Abstraction Layer).
 
-Questa libreria nasce per superare le comuni "code smell" dello sviluppo didattico, offrendo soluzioni robuste, deterministiche e totalmente **non bloccanti** (senza l'uso di `HAL_Delay`).
+Questa libreria offre soluzioni robuste, deterministiche e totalmente non bloccanti (senza l'uso di HAL_Delay).
 
 ---
 
-## 📂 Struttura del Progetto
+## Struttura del Progetto
 La libreria è organizzata secondo il layout standard dei progetti STM32Cube:
 
 ```text
@@ -30,39 +30,39 @@ libreria/
 
 ---
 
-## 🌟 Caratteristiche Principali
+## Caratteristiche Principali
 
 ### 1. Astrazione Hardware Totale (Logical Mapping)
-Il codice separa il concetto logico (es. *pulsante premuto*) dal livello elettrico del pin fisco (es. *0 Volt / RESET*). 
-*   **LED Attivi Bassi o Attivi Alti:** Se il tuo LED si accende a livello basso (0V), ti basta cambiare una sola riga di mappatura in `led.c` senza toccare la logica applicativa nel `main.c`.
-*   **Pulsanti in Pull-Up o Pull-Down:** La lettura fisica del pulsante in Pull-Up (0V = premuto, 3.3V = a riposo) viene raddrizzata automaticamente in uno stato logico lineare (`BUTTON_PRESSED` = 1, `BUTTON_RELEASED` = 0).
+Il codice separa il concetto logico (es. pulsante premuto) dal livello elettrico del pin fisco (es. 0 Volt / RESET). 
+* **LED Attivi Bassi o Attivi Alti:** Se il tuo LED si accende a livello basso (0V), ti basta cambiare una sola riga di mappatura in `led.c` senza toccare la logica applicativa nel `main.c`.
+* **Pulsanti in Pull-Up o Pull-Down:** La lettura fisica del pulsante in Pull-Up (0V = premuto, 3.3V = a riposo) viene raddrizzata automaticamente in uno stato logico lineare (`BUTTON_PRESSED` = 1, `BUTTON_RELEASED` = 0).
 
 ### 2. Debounce Software Non Bloccante
 Il driver del pulsante implementa un algoritmo antirimbalzo (debounce) asincrono basato sulla funzione `HAL_GetTick()`. Le oscillazioni elettriche iniziali dei contatti metallici vengono filtrate via software senza congelare la CPU.
 
 ### 3. Sicurezza ed Incapsulamento (MISRA C Friendly)
-*   **Controllo dei puntatori:** Tutte le funzioni controllano preventivamente se i puntatori ad oggetto passati sono `NULL`, prevenendo crash catastrofici del firmware (**HardFault**).
-*   **Determinismo all'avvio:** Nessuna variabile locale viene lasciata non inizializzata, eliminando comportamenti imprevedibili dovuti a residui casuali nella RAM all'accensione della scheda.
+* **Controllo dei puntatori:** Tutte le funzioni controllano preventivamente se i puntatori ad oggetto passati sono `NULL`, prevenendo crash catastrofici del firmware (HardFault).
+* **Determinismo all'avvio:** Nessuna variabile locale viene lasciata non inizializzata, eliminando comportamenti imprevedibili dovuti a residui casuali nella RAM all'accensione della scheda.
 
 ### 4. Coda FIFO Asincrona Sicura e Configurabile (Thread-Safe)
 Il modulo `queue` implementa un buffer circolare generico (tramite `memcpy` e puntatori `void*`) con protezione concorrente per l'uso ad interrupt. Supporta due modalità operative configurabili tramite `queue_set_mode()`:
-*   **`QUEUE_MODE_REJECT` (Default):** Se la coda è piena, rifiuta i nuovi inserimenti restituendo `QUEUE_FULL`. Ideale per non perdere messaggi o comandi di controllo (es. gli override del semaforo).
-*   **`QUEUE_MODE_OVERWRITE`:** Se la coda è piena, il nuovo dato inserito sovrascrive automaticamente quello più vecchio (facendo avanzare la testa `head` di conseguenza). Ideale per buffer di dati continui (es. medie mobili di sensori) in cui contano solo le letture più fresche.
-*   **Sicurezza nei contesti ad Interrupt:** Tutte le funzioni critiche disabilitano temporaneamente gli interrupt (`__disable_irq()`), rendendo le modifiche degli indici atomiche e protette da preemption concorrente.
+* **`QUEUE_MODE_REJECT` (Default):** Se la coda è piena, rifiuta i nuovi inserimenti restituendo `QUEUE_FULL`. Ideale per non perdere messaggi o comandi di controllo (es. gli override del semaforo).
+* **`QUEUE_MODE_OVERWRITE`:** Se la coda è piena, il nuovo dato inserito sovrascrive automaticamente quello più vecchio (facendo avanzare la testa `head` di conseguenza). Ideale per buffer di dati continui (es. medie mobili di sensori) in cui contano solo le letture più fresche.
+* **Sicurezza nei contesti ad Interrupt:** Tutte le funzioni critiche disabilitano temporaneamente gli interrupt (`__disable_irq()`), rendendo le modifiche degli indici atomiche e protette da preemption concorrente.
 
 ---
 
-## 🔧 Integrazione in STM32CubeIDE
+## Integrazione in STM32CubeIDE
 
 1. Copia la cartella `libreria` all'interno dell'albero delle directory del tuo progetto STM32.
-2. In STM32CubeIDE, fai tasto destro sulla cartella di progetto ➡️ **Properties**.
-3. Naviga su **C/C++ Build** ➡️ **Settings** ➡️ **Tool Settings** ➡️ **MCU GCC Compiler** ➡️ **Include paths**.
+2. In STM32CubeIDE, fai tasto destro sulla cartella di progetto -> **Properties**.
+3. Naviga su **C/C++ Build** -> **Settings** -> **Tool Settings** -> **MCU GCC Compiler** -> **Include paths**.
 4. Clicca sull'icona **Add...** e aggiungi il percorso relativo della cartella `libreria/Inc` (es. `../libreria/Inc`).
-5. Assicurati che la cartella `libreria/Src` sia inclusa tra le cartelle sorgenti per la compilazione (solitamente STM32CubeIDE la rileva automaticamente).
+5. Assicurati che la cartella `libreria/Src` sei inclusa tra le cartelle sorgenti per la compilazione (solitamente STM32CubeIDE la rileva automaticamente).
 
 ---
 
-## 💻 Esempio di Utilizzo (Quick Start)
+## Esempio di Utilizzo (Quick Start)
 
 Ecco un esempio completo di come orchestrare un LED ed un pulsante all'interno del file `main.c`:
 
@@ -112,5 +112,12 @@ int main(void)
 
 ---
 
-## 📝 Licenza
+## Crediti e Riconoscimenti
+
+* **Driver RTC DS3231 (`ds3231_for_stm32_hal`):** Questo modulo è basato sulla libreria originale sviluppata da `@eepj` (disponibile su [GitHub/eepj](https://github.com/eepj)). È stata adattata e migliorata inserendo maschere per i registri degli allarmi (Alarm1, Alarm2) e per l'output a 32kHz.
+* **Driver LED, Button, Queue, Timer e template FSM:** Questi moduli derivano dal materiale didattico fornito dall'**Università degli Studi di Salerno (UNISA)**. I driver sono stati ottimizzati, corretti e arricchiti dall'autore durante lo sviluppo dei vari progetti universitari (tra cui la risoluzione del problema relativo all'avvio asincrono e agli interrupt spuri sui timer hardware).
+
+---
+
+## Licenza
 Questo progetto è rilasciato sotto licenza MIT. Sentiti libero di usarlo, modificarlo e distribuirlo nei tuoi progetti commerciali o personali.
