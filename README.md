@@ -64,7 +64,7 @@ Il modulo `queue` implementa un buffer circolare generico (tramite `memcpy` e pu
 
 ## Crediti e Riconoscimenti
 
-* **Driver RTC DS3231 (`ds3231_for_stm32_hal`):** Questo modulo è basato sulla libreria originale sviluppata da `@eepj` (disponibile su [GitHub/eepj](https://github.com/eepj)). È stata adattata e migliorata per supportare maschere specifiche per i registri degli allarmi (Alarm1, Alarm2) e per l'abilitazione del pin a 32kHz.
+* **Driver RTC DS3231 (`ds3231_for_stm32_hal`):** Questo modulo è basato sulla libreria originale sviluppata da `@eepj` (disponibile su [GitHub/eepj](https://github.com/eepj)). È stata adattata e migliorata dall'autore per supportare maschere specifiche per i registri degli allarmi (Alarm1, Alarm2) e per l'abilitazione del pin a 32kHz. Queste ottimizzazioni sono state proposte dall'autore sotto forma di Pull Request nel repository originale e integrate in questa raccolta in attesa di un'eventuale approvazione (data la potenziale inattività del maintainer originale).
 * **Driver LED, Button, Queue, Timer e template FSM:** Questi moduli derivano dal materiale didattico fornito dall'**Università degli Studi di Salerno (UNISA)**. I driver sono ottimizzati, integrati ed estesi dall'autore per la risoluzione dei compiti d'esame e lo sviluppo dei vari progetti accademici.
 
 ---
