@@ -58,64 +58,14 @@ Il modulo `queue` implementa un buffer circolare generico (tramite `memcpy` e pu
 2. In STM32CubeIDE, fai tasto destro sulla cartella di progetto -> **Properties**.
 3. Naviga su **C/C++ Build** -> **Settings** -> **Tool Settings** -> **MCU GCC Compiler** -> **Include paths**.
 4. Clicca sull'icona **Add...** e aggiungi il percorso relativo della cartella `libreria/Inc` (es. `../libreria/Inc`).
-5. Assicurati che la cartella `libreria/Src` sei inclusa tra le cartelle sorgenti per la compilazione (solitamente STM32CubeIDE la rileva automaticamente).
-
----
-
-## Esempio di Utilizzo (Quick Start)
-
-Ecco un esempio completo di come orchestrare un LED ed un pulsante all'interno del file `main.c`:
-
-```c
-#include "main.h"
-#include "gpio.h"
-#include "led.h"
-#include "button.h"
-
-int main(void)
-{
-  // 1. Inizializzazioni Hardware generate da CubeMX
-  HAL_Init();
-  SystemClock_Config();
-  MX_GPIO_Init();
-
-  // 2. Dichiarazione e Inizializzazione degli oggetti driver
-  led_t green_led;
-  button_t blue_button;
-
-  // Inizializziamo in modo sicuro lo stato logico di partenza
-  button_state_t button_state = BUTTON_RELEASED;
-  button_state_t last_button_state = BUTTON_RELEASED;
-
-  // Associazione dei pin fisici e impostazione dei parametri di funzionamento
-  led_init(&green_led, LED_GPIO_Port, LED_Pin, LED_OFF);
-  button_init(&blue_button, BUTTON_GPIO_Port, BUTTON_Pin, BUTTON_RELEASED);
-  button_set_delay(&blue_button, 100); // 100 ms di tempo di debounce
-
-  // 3. Loop principale (Non bloccante)
-  while (1)
-  {
-    // Memorizziamo lo stato del ciclo precedente
-    last_button_state = button_state;
-
-    // Lettura filtrata del pulsante (non bloccante)
-    button_read(&blue_button, &button_state);
-
-    // Rilevamento del fronte di salita (Trigger all'istante esatto del click fisco)
-    if ((button_state == BUTTON_PRESSED) && (last_button_state != button_state))
-    {
-      led_toggle(&green_led); // Esegue il toggle del LED
-    }
-  }
-}
-```
+5. Assicurati che la cartella `libreria/Src` sia inclusa tra le cartelle sorgenti per la compilazione (solitamente STM32CubeIDE la rileva automaticamente).
 
 ---
 
 ## Crediti e Riconoscimenti
 
-* **Driver RTC DS3231 (`ds3231_for_stm32_hal`):** Questo modulo è basato sulla libreria originale sviluppata da `@eepj` (disponibile su [GitHub/eepj](https://github.com/eepj)). È stata adattata e migliorata inserendo maschere per i registri degli allarmi (Alarm1, Alarm2) e per l'output a 32kHz.
-* **Driver LED, Button, Queue, Timer e template FSM:** Questi moduli derivano dal materiale didattico fornito dall'**Università degli Studi di Salerno (UNISA)**. I driver sono stati ottimizzati, corretti e arricchiti dall'autore durante lo sviluppo dei vari progetti universitari (tra cui la risoluzione del problema relativo all'avvio asincrono e agli interrupt spuri sui timer hardware).
+* **Driver RTC DS3231 (`ds3231_for_stm32_hal`):** Questo modulo è basato sulla libreria originale sviluppata da `@eepj` (disponibile su [GitHub/eepj](https://github.com/eepj)). È stata adattata e migliorata per supportare maschere specifiche per i registri degli allarmi (Alarm1, Alarm2) e per l'abilitazione del pin a 32kHz.
+* **Driver LED, Button, Queue, Timer e template FSM:** Questi moduli derivano dal materiale didattico fornito dall'**Università degli Studi di Salerno (UNISA)**. I driver sono ottimizzati, integrati ed estesi dall'autore per la risoluzione dei compiti d'esame e lo sviluppo dei vari progetti accademici.
 
 ---
 
